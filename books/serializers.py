@@ -5,7 +5,7 @@ from .models import Category, Book, Edition, BookImage
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'image']
 
 
 class BookImageSerializer(serializers.ModelSerializer):
