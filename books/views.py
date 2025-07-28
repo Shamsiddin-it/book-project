@@ -7,12 +7,16 @@ from .serializers import (
     BookImageSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.parsers import MultiPartParser, FormParser
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    # ✅ Needed to handle file/image uploads
+    parser_classes = [MultiPartParser, FormParser]
 
 
 class BookViewSet(viewsets.ModelViewSet):

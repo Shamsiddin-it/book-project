@@ -142,6 +142,8 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+
 }
 
 from datetime import timedelta
@@ -162,9 +164,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://147.45.146.15:4004",   # Production or test server
 ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
-}
 
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
