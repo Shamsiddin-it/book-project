@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Category, Book, Edition, BookImage
+from .models import Category, Book, BookImage, Author, BookAuthor
 
 
 @admin.register(Category)
@@ -13,25 +13,32 @@ class BookImageInline(admin.TabularInline):
     extra = 1
 
 
+class BookAuthorInline(admin.TabularInline):
+    model = BookAuthor
+    extra = 1
+
+
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'authors', 'language', 'created_at']
+    list_display = ['id', 'name', 'get_authors', 'language', 'created_at']
     list_filter = ['language', 'categories']
-    search_fields = ['name', 'authors', 'description']
+    search_fields = ['name', 'description']
     filter_horizontal = ['categories']
+    inlines = [BookAuthorInline]
+
+    def get_authors(self, obj):
+        return ", ".join([author.name for author in obj.authors.all()])
+    get_authors.short_description = 'Authors'
 
 
-@admin.register(Edition)
-class EditionAdmin(admin.ModelAdmin):
-    list_display = [
-        'id', 'book', 'format', 'cover', 'isbn', 'publishing_year',
-        'price', 'is_physical', 'is_active'
-    ]
-    list_filter = ['format', 'cover', 'is_physical', 'is_active']
-    search_fields = ['book__name', 'isbn']
-    inlines = [BookImageInline]
 
 
 @admin.register(BookImage)
 class BookImageAdmin(admin.ModelAdmin):
-    list_display = ['id', 'edition', 'image']
+    list_display = ['id', 'book', 'image']
+
+
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ['id', 'name']
+    search_fields = ['name']
