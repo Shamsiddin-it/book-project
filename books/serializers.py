@@ -1,5 +1,8 @@
 from rest_framework import serializers
-from .models import Category, Book, Edition, BookImage
+from .models import (
+    Category, Author, Book, BookAuthor,
+    BookImage
+)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -8,32 +11,44 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'image']
 
 
+class AuthorSerializer(serializers.ModelSerializer):
+    books_amount = Author.books_amount
+    class Meta:
+        model = Author
+        fields = ['id', 'name', 'description', 'books_amount', 'image']
+
+
 class BookImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookImage
-        fields = ['id', 'image']
+        fields = ['id', 'image', 'book']
 
 
-class EditionSerializer(serializers.ModelSerializer):
-    images = BookImageSerializer(many=True, read_only=True)
-    book_name = serializers.CharField(source='book.name', read_only=True)
+class BookAuthorSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+    author_id = serializers.PrimaryKeyRelatedField(
+        queryset=Author.objects.all(),
+        source='author',
+        write_only=True
+    )
 
     class Meta:
-        model = Edition
-        fields = [
-            'id', 'book', 'book_name', 'cover', 'format', 'isbn', 'pages',
-            'publishing_year', 'price', 'is_active', 'is_physical', 'file',
-            'images', 'created_at'
-        ]
+        model = BookAuthor
+        fields = ['id', 'book', 'author', 'author_id']
+        extra_kwargs = {
+            'book': {'read_only': True},
+        }
 
 
 class BookSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
-    editions = EditionSerializer(many=True, read_only=True)
-
+    authors = AuthorSerializer(many=True, read_only=True)
+    publishing_year = Book.publishing_year
+    audio_link = Book.audio_link
     class Meta:
         model = Book
         fields = [
-            'id', 'name', 'description', 'authors', 'language',
-            'categories', 'editions', 'created_at'
+            'id', 'name', 'description', 'language',
+            'categories', 'authors', 'cover', 'isbn', 'pages', 
+            'publishing_year', 'price', 'file', 'audio_link'
         ]
