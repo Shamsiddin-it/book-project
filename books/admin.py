@@ -24,7 +24,7 @@ class BookAdmin(admin.ModelAdmin):
     list_filter = ['language', 'categories']
     search_fields = ['name', 'description']
     filter_horizontal = ['categories']
-    inlines = [BookAuthorInline]
+    inlines = [BookAuthorInline, BookImageInline]
 
     def get_authors(self, obj):
         return ", ".join([author.name for author in obj.authors.all()])
