@@ -43,12 +43,13 @@ class BookAuthorSerializer(serializers.ModelSerializer):
 class BookSerializer(serializers.ModelSerializer):
     categories = CategorySerializer(many=True, read_only=True)
     authors = AuthorSerializer(many=True, read_only=True)
+    images = BookImageSerializer(source='images', many=True, read_only = True)
     publishing_year = Book.publishing_year
     audio_link = Book.audio_link
     class Meta:
         model = Book
         fields = [
             'id', 'name', 'description', 'language',
-            'categories', 'authors', 'cover', 'isbn', 'pages', 
+            'categories', 'authors', 'images', 'cover', 'isbn', 'pages', 
             'publishing_year', 'price', 'file', 'audio_link'
         ]
