@@ -10,7 +10,9 @@ from .serializers import (
     BookAuthorSerializer,  BookImageSerializer
 )
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -31,6 +33,15 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
+
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def toggle_like(self, request, pk=None):
+        book = self.get_object()
+        liked, created = Liked.objects.get_or_create(user=request.user, book=book)
+        if not created:
+            liked.delete()
+            return Response({'liked': False})
+        return Response({'liked': True})
 
 
 class BookAuthorViewSet(viewsets.ModelViewSet):

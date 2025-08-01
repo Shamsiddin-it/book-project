@@ -3,6 +3,7 @@ from .models import (
     Category, Author, Book, BookAuthor,
     BookImage
 )
+from social.models import Liked
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -47,10 +48,17 @@ class BookSerializer(serializers.ModelSerializer):
     imges = BookImageSerializer(source='images', many=True, read_only = True)
     publishing_year = Book.publishing_year
     audio_link = Book.audio_link
+    is_liked = serializers.SerializerMethodField()
     class Meta:
         model = Book
         fields = [
             'id', 'name', 'description', 'language',
             'categories', 'authors', 'imges', 'cover', 'isbn', 'pages', 
-            'publishing_year', 'price', 'file', 'audio_link'
+            'publishing_year', 'price', 'file', 'audio_link', 'is_liked'
         ]
+
+    def get_is_liked(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return Liked.objects.filter(user=user, book=obj).exists()
+        return False
