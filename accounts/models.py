@@ -25,7 +25,7 @@ class User(AbstractUser):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     avatar = models.ImageField(upload_to='media/avatars/', null=True, blank=True)
-    favourites = models.ManyToManyField(Book, related_name='liked_by')
+    favourites = models.ManyToManyField(Book, related_name='liked_by', null=True, blank=True)
 
     def __str__(self):
         return f"Profile of {self.user.username}"
