@@ -117,6 +117,22 @@
         "documentation": {}
     },
     {
+        "label": "migrations",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
+        "label": "models",
+        "importPath": "django.db",
+        "description": "django.db",
+        "isExtraImport": true,
+        "detail": "django.db",
+        "documentation": {}
+    },
+    {
         "label": "models",
         "importPath": "django.db",
         "description": "django.db",
@@ -880,6 +896,15 @@
         "description": "accounts.migrations.0003_alter_profile_user",
         "peekOfCode": "class Migration(migrations.Migration):\n    dependencies = [\n        ('accounts', '0002_profile'),\n    ]\n    operations = [\n        migrations.AlterField(\n            model_name='profile',\n            name='user',\n            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='profile', to=settings.AUTH_USER_MODEL),\n        ),",
         "detail": "accounts.migrations.0003_alter_profile_user",
+        "documentation": {}
+    },
+    {
+        "label": "Migration",
+        "kind": 6,
+        "importPath": "accounts.migrations.0004_alter_profile_favourites",
+        "description": "accounts.migrations.0004_alter_profile_favourites",
+        "peekOfCode": "class Migration(migrations.Migration):\n    dependencies = [\n        ('accounts', '0003_alter_profile_user'),\n        ('books', '0002_category_subcategory_of_alter_book_audio_link'),\n    ]\n    operations = [\n        migrations.AlterField(\n            model_name='profile',\n            name='favourites',\n            field=models.ManyToManyField(blank=True, null=True, related_name='liked_by', to='books.book'),",
+        "detail": "accounts.migrations.0004_alter_profile_favourites",
         "documentation": {}
     },
     {
