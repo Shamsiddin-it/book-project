@@ -6,9 +6,10 @@ from .models import (
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    subcategory_of = Category.subcategory_of
     class Meta:
         model = Category
-        fields = ['id', 'name', 'image']
+        fields = ['id', 'name', 'image', 'subcategory_of']
 
 
 class AuthorSerializer(serializers.ModelSerializer):
