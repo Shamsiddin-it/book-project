@@ -932,7 +932,7 @@
         "kind": 6,
         "importPath": "accounts.models",
         "description": "accounts.models",
-        "peekOfCode": "class Profile(models.Model):\n    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')\n    avatar = models.ImageField(upload_to='media/avatars/', null=True, blank=True)\n    favourites = models.ManyToManyField(Book, related_name='liked_by')\n    def __str__(self):\n        return f\"Profile of {self.user.username}\"",
+        "peekOfCode": "class Profile(models.Model):\n    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')\n    avatar = models.ImageField(upload_to='media/avatars/', null=True, blank=True)\n    favourites = models.ManyToManyField(Book, related_name='liked_by', null=True, blank=True)\n    def __str__(self):\n        return f\"Profile of {self.user.username}\"",
         "detail": "accounts.models",
         "documentation": {}
     },
