@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+import django.db
+from .models import Profile, User
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
@@ -12,3 +13,7 @@ class CustomUserAdmin(UserAdmin):
             'fields': ('role', 'phone', 'photo', 'birthdate'),
         }),
     )
+
+@admin.register(Profile)
+class CustomProfileAdmin(admin.ModelAdmin):
+    model = Profile
