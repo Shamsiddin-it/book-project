@@ -4,6 +4,13 @@ from django.db import models
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     image = models.ImageField(upload_to='category_images/')
+    subcategory_of = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='subcategories',
+    )
 
     def __str__(self):
         return self.name
@@ -30,7 +37,7 @@ class Book(models.Model):
     is_physical = models.BooleanField(default=True)  # 🔥 можно ли купить физически
     file = models.FileField(upload_to="book_files/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    audio_link = models.TextField()
+    audio_link = models.TextField(null=True, blank=True)
     def __str__(self):
         return self.name
 
