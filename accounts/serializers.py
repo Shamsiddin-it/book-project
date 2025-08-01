@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
-from .models import User
-
+from .models import User, Profile
+from books.serializers import BookSerializer
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     password2 = serializers.CharField(write_only=True)
@@ -28,3 +28,13 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = ['password']
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only = True)
+    favourites = BookSerializer(many=True, read_only=True)  # Список избранных книг
+    
+    class Meta:
+        model = Profile
+        fields = ['user', 'avatar', 'favourites']
+        depth = 1 

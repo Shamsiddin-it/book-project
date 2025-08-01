@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-
+from books.models import Book
 class Role(models.TextChoices):
     ADMIN = 'admin', 'Admin'
     # PROVIDER = 'provider', 'Service Provider'
@@ -20,3 +20,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    avatar = models.ImageField(upload_to='media/avatars/', null=True, blank=True)
+    favourites = models.ManyToManyField(Book, related_name='liked_by')
+
+    def __str__(self):
+        return f"Profile of {self.user.username}"
+
