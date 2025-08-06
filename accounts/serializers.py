@@ -33,8 +33,8 @@ class UserSerializer(serializers.ModelSerializer):
 class ProfileSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only = True)
     favourites = BookSerializer(many=True, read_only=True)  # Список избранных книг
-    
+    reads = BookSerializer(many=True, read_only = True)
     class Meta:
         model = Profile
-        fields = ['user', 'avatar', 'favourites']
+        fields = ['user', 'favourites', 'reads']
         depth = 1 

@@ -1,6 +1,6 @@
 from rest_framework import viewsets, permissions
 from rest_framework.parsers import MultiPartParser, FormParser
-
+from social.models import Liked
 from .models import (
     Category, Author, Book, BookAuthor,
     BookImage
