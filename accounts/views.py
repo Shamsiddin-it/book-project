@@ -14,7 +14,7 @@ class RegisterView(generics.CreateAPIView):
 class ProfileView(generics.RetrieveUpdateAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [permissions.IsAuthenticated]
-
+    
     def get_object(self):
         profile, _ = Profile.objects.get_or_create(user=self.request.user)
         return profile
@@ -37,4 +37,13 @@ class FavouriteBooksView(APIView):
         user = request.user
         favourites = user.profile.favourites.all()
         serializer = BookSerializer(favourites, many=True, context={'request': request})
+        return Response(serializer.data)
+
+class ShelfBookView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        reads = user.profile.reads.all()
+        serializer = BookSerializer(reads, many=True, context={'request': request})
         return Response(serializer.data)

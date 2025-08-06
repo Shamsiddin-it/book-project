@@ -4,6 +4,7 @@ from .models import (
     BookImage
 )
 from social.models import Liked
+from shelf.models import BookShelf
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -49,16 +50,23 @@ class BookSerializer(serializers.ModelSerializer):
     publishing_year = Book.publishing_year
     audio_link = Book.audio_link
     is_liked = serializers.SerializerMethodField()
+    is_read = serializers.SerializerMethodField()
     class Meta:
         model = Book
         fields = [
             'id', 'name', 'description', 'language',
             'categories', 'authors', 'imges', 'cover', 'isbn', 'pages', 
-            'publishing_year', 'price', 'file', 'audio_link', 'is_liked'
+            'publishing_year', 'price', 'file', 'audio_link', 'is_liked', 'is_read'
         ]
 
     def get_is_liked(self, obj):
         user = self.context.get('request').user
         if user.is_authenticated:
             return Liked.objects.filter(user=user, book=obj).exists()
+        return False
+    
+    def get_is_read(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            return BookShelf.objects.filter(user=user, book=obj).exists()
         return False
