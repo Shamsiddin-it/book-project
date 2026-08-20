@@ -1,4 +1,19 @@
-.venv
+# Виртуальное окружение
+.venv/
+venv/
+
+# Секреты
+.env
+
+# База и пользовательские файлы
 db.sqlite3
-tz
-media
+media/
+staticfiles/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Редакторы
+.vscode/
+.idea/

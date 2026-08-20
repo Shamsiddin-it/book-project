@@ -1,19 +1,20 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-import django.db
-from .models import Profile, User
+
+from .models import User
+
 
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     model = User
-    list_display = ('username', 'email', 'role', 'is_staff', 'is_active')
+    list_display = ('username', 'email', 'role', 'is_staff', 'is_active', 'date_joined')
     list_filter = ('role', 'is_staff', 'is_active')
+    search_fields = ('username', 'email')
     fieldsets = UserAdmin.fieldsets + (
-        (None, {
-            'fields': ('role', 'phone', 'photo', 'birthdate'),
+        ('Профиль книголюба', {
+            'fields': ('role', 'phone', 'photo', 'birthdate', 'bio', 'is_shelf_public'),
         }),
     )
-
-@admin.register(Profile)
-class CustomProfileAdmin(admin.ModelAdmin):
-    model = Profile
+    add_fieldsets = UserAdmin.add_fieldsets + (
+        ('Профиль книголюба', {'fields': ('role', 'email')}),
+    )
