@@ -1,3 +1,4 @@
+from django.db.models import Count
 from rest_framework import generics, permissions, status
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.response import Response
@@ -28,7 +29,10 @@ class MeView(generics.RetrieveUpdateAPIView):
 class PublicUserView(generics.RetrieveAPIView):
     """Чужой профиль по id — нужен для соцчасти и просмотра полки."""
 
-    queryset = User.objects.all()
+    queryset = User.objects.annotate(
+        followers_count=Count('followers', distinct=True),
+        following_count=Count('following', distinct=True),
+    )
     serializer_class = PublicUserSerializer
     permission_classes = [permissions.AllowAny]
 

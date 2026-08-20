@@ -32,8 +32,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         return user
 
 
+class UserBriefSerializer(serializers.ModelSerializer):
+    """
+    Для вложения в комментарии, заметки и полку.
+    Без счётчиков подписок — иначе получаем два запроса на каждого автора.
+    """
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'photo']
+
+
 class PublicUserSerializer(serializers.ModelSerializer):
-    """Как пользователя видят другие пользователи."""
+    """
+    Профиль пользователя. Счётчики приходят из annotate() во вьюхе,
+    полей с такими именами в модели нет.
+    """
 
     followers_count = serializers.IntegerField(read_only=True)
     following_count = serializers.IntegerField(read_only=True)

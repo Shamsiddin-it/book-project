@@ -30,11 +30,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return f'{self.username} ({self.role})'
-
-    @property
-    def followers_count(self):
-        return self.followers.count()
-
-    @property
-    def following_count(self):
-        return self.following.count()
