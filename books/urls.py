@@ -1,22 +1,22 @@
-from django.urls import path
+from rest_framework.routers import DefaultRouter
+
 from .views import (
-    CategoryViewSet, AuthorViewSet, BookViewSet,
-    BookAuthorViewSet, BookImageViewSet
+    AuthorViewSet,
+    BookAuthorViewSet,
+    BookViewSet,
+    CategoryViewSet,
+    CharacterViewSet,
+    EditionViewSet,
+    MoodboardImageViewSet,
 )
 
-urlpatterns = [
-    path('categories/', CategoryViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('categories/<int:pk>/', CategoryViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
+router = DefaultRouter()
+router.register('books', BookViewSet, basename='book')
+router.register('categories', CategoryViewSet, basename='category')
+router.register('authors', AuthorViewSet, basename='author')
+router.register('editions', EditionViewSet, basename='edition')
+router.register('moodboard', MoodboardImageViewSet, basename='moodboard')
+router.register('characters', CharacterViewSet, basename='character')
+router.register('book-authors', BookAuthorViewSet, basename='book-author')
 
-    path('authors/', AuthorViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('authors/<int:pk>/', AuthorViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
-
-    path('books/', BookViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('books/<int:pk>/', BookViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
-
-    path('book-authors/', BookAuthorViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('book-authors/<int:pk>/', BookAuthorViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
-
-    path('images/', BookImageViewSet.as_view({'get': 'list', 'post': 'create'})),
-    path('images/<int:pk>/', BookImageViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy'})),
-]
+urlpatterns = router.urls
