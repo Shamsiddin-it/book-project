@@ -5,11 +5,11 @@ from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from server.permissions import IsAdminOrReadOnly
 from shelf.models import ShelfItem
 from social.models import Like
 
 from .models import Author, Book, BookAuthor, Category, Character, Edition, MoodboardImage
-from .permissions import IsAdminOrReadOnly
 from .serializers import (
     AuthorSerializer,
     BookAuthorSerializer,
