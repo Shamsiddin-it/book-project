@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'shelf',
     'notes',
     'purchase',
+    'reader',
     'chats',
 
     # Сторонние
@@ -145,6 +146,17 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+# Файлы книг. Лежат ВНЕ MEDIA_ROOT, потому что MEDIA_ROOT раздаётся по /media/
+# и всё в нём доступно по прямой ссылке. Наружу эти файлы уходят только через
+# ридер, после проверки покупки.
+PROTECTED_MEDIA_ROOT = BASE_DIR / 'protected_media'
+
+# В проде отдачу лучше переложить на веб-сервер: Django возвращает пустой ответ
+# с заголовком X-Accel-Redirect (nginx) или X-Sendfile (Apache), а файл шлёт сам
+# сервер. Включается переменной окружения.
+PROTECTED_MEDIA_ACCEL_HEADER = os.environ.get('PROTECTED_MEDIA_ACCEL_HEADER', '')
+PROTECTED_MEDIA_INTERNAL_URL = os.environ.get('PROTECTED_MEDIA_INTERNAL_URL', '/protected/')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

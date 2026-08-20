@@ -21,6 +21,13 @@ class ShelfItem(models.Model):
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.WANT_TO_READ)
     is_owned = models.BooleanField(default=False, help_text='Куплено пользователем.')
     progress_percent = models.PositiveSmallIntegerField(default=0)
+
+    # Место, на котором пользователь остановился. Формат зависит от типа издания:
+    # EPUB CFI для книги, номер страницы для PDF, секунды для аудио.
+    # Хранится строкой, чтобы ридер на фронте не был ограничен одним форматом.
+    position = models.CharField(max_length=255, blank=True)
+    last_read_at = models.DateTimeField(null=True, blank=True)
+
     added_at = models.DateTimeField(auto_now_add=True)
     finished_at = models.DateTimeField(null=True, blank=True)
 

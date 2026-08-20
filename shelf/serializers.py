@@ -37,11 +37,13 @@ class ShelfItemSerializer(serializers.ModelSerializer):
         model = ShelfItem
         fields = [
             'id', 'edition', 'edition_id', 'status', 'status_display',
-            'is_owned', 'progress_percent', 'added_at', 'finished_at',
+            'is_owned', 'progress_percent', 'position', 'last_read_at',
+            'added_at', 'finished_at',
         ]
         # is_owned выставляется покупкой, а не клиентом — иначе платный
         # контент можно было бы получить обычным PATCH.
-        read_only_fields = ['is_owned', 'added_at', 'finished_at']
+        # position и last_read_at пишет ридер, через /api/reader/<id>/progress/.
+        read_only_fields = ['is_owned', 'position', 'last_read_at', 'added_at', 'finished_at']
 
     def validate_progress_percent(self, value):
         if not 0 <= value <= 100:
