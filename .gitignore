@@ -8,6 +8,7 @@ venv/
 # База и пользовательские файлы
 db.sqlite3
 media/
+protected_media/
 staticfiles/
 
 # Python

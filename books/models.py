@@ -1,6 +1,8 @@
 from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 
+from server.storages import protected_storage
+
 
 class Language(models.TextChoices):
     """Языки, на которых доступны книги. Используется для фильтрации библиотеки."""
@@ -114,7 +116,11 @@ class Edition(models.Model):
     is_active = models.BooleanField(default=True)
 
     # Файлы для чтения и прослушивания внутри сайта.
-    file = models.FileField(upload_to='book_files/', null=True, blank=True)
+    # Приватное хранилище: прямой ссылки на файл не существует, выдачей
+    # занимается ридер после проверки, что издание куплено.
+    file = models.FileField(
+        upload_to='book_files/', null=True, blank=True, storage=protected_storage,
+    )
     audio_link = models.URLField(max_length=500, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
