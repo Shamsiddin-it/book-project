@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { apiErrorMessage } from '../api/client'
 import { fetchBookReviews, fetchRatingSummary, submitReview } from '../api/endpoints'
 import { useAuth } from '../auth/useAuth'
+import { withCount } from '../lib/plural'
 import { ErrorNote, Spinner } from './Spinner'
 import { SectionHeading, Stars } from './ui'
 import { pillClass } from './styles'
@@ -131,7 +132,7 @@ export function ReviewsSection({ bookId }: { bookId: number }) {
               <Stars value={summary?.average_rating ?? null} />
             </div>
             <p className="mt-1 text-xs text-ink-faint">
-              {summary?.reviews_count ?? 0} оценок
+              {withCount(summary?.reviews_count ?? 0, 'оценка', 'оценки', 'оценок')}
             </p>
 
             {summary && summary.reviews_count > 0 && (

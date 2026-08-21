@@ -7,12 +7,16 @@ import type {
   BookListItem,
   CartResponse,
   Category,
-  LanguageOption,
-  Me,
+  Comment,
   GamificationProfile,
+  LanguageOption,
   LeaderboardEntry,
+  Me,
+  Note,
+  NoteKind,
   Order,
   Paginated,
+  PublicUser,
   RatingSummary,
   ReaderManifest,
   RecommendationResponse,
@@ -244,5 +248,111 @@ export async function fetchBlogPost(slug: string): Promise<BlogPost> {
 
 export async function fetchBlogTags(): Promise<BlogTag[]> {
   const { data } = await api.get<BlogTag[]>('/blog/tags/')
+  return data
+}
+
+/* ------------------------------------------------------------ соцчасть */
+
+export async function fetchComments(bookId: number) {
+  const { data } = await api.get<Paginated<Comment>>('/social/comments/', {
+    params: { book: bookId },
+  })
+  return data
+}
+
+export async function postComment(payload: {
+  book: number
+  text: string
+  parent?: number
+  character?: number
+  has_spoilers?: boolean
+}) {
+  const { data } = await api.post<Comment>('/social/comments/', payload)
+  return data
+}
+
+export async function updateComment(id: number, text: string) {
+  const { data } = await api.patch<Comment>(`/social/comments/${id}/`, { text })
+  return data
+}
+
+export async function deleteComment(id: number) {
+  await api.delete(`/social/comments/${id}/`)
+}
+
+export async function toggleCommentLike(id: number) {
+  const { data } = await api.post<{ liked: boolean; likes_count: number }>(
+    `/social/comments/${id}/toggle_like/`,
+  )
+  return data
+}
+
+export async function toggleFollow(userId: number) {
+  const { data } = await api.post<{ following: boolean; followers_count: number }>(
+    `/social/users/${userId}/follow/`,
+  )
+  return data
+}
+
+export async function fetchFollowers(userId: number) {
+  const { data } = await api.get<Paginated<PublicUser>>(`/social/users/${userId}/followers/`)
+  return data
+}
+
+export async function fetchFollowing(userId: number) {
+  const { data } = await api.get<Paginated<PublicUser>>(`/social/users/${userId}/following/`)
+  return data
+}
+
+/* --------------------------------------------------- чужие пользователи */
+
+export async function fetchPublicUser(userId: number): Promise<PublicUser> {
+  const { data } = await api.get<PublicUser>(`/accounts/users/${userId}/`)
+  return data
+}
+
+export async function fetchPublicShelf(userId: number) {
+  const { data } = await api.get<Paginated<ShelfItem>>(`/shelf/users/${userId}/`)
+  return data
+}
+
+export async function fetchPublicGamification(userId: number): Promise<GamificationProfile> {
+  const { data } = await api.get<GamificationProfile>(`/gamification/users/${userId}/`)
+  return data
+}
+
+/* ------------------------------------------------- заметки и цитаты */
+
+export async function fetchMyNotes(params: { book?: number; kind?: NoteKind } = {}) {
+  const { data } = await api.get<Paginated<Note>>('/notes/', { params })
+  return data
+}
+
+export async function createNote(payload: {
+  book: number
+  text: string
+  kind?: NoteKind
+  page?: number
+  is_public?: boolean
+  has_spoilers?: boolean
+}) {
+  const { data } = await api.post<Note>('/notes/', payload)
+  return data
+}
+
+export async function deleteNote(id: number) {
+  await api.delete(`/notes/${id}/`)
+}
+
+/** Публичные цитаты и заметки по книге — их видно всем на странице книги. */
+export async function fetchBookNotes(bookId: number, kind?: NoteKind) {
+  const { data } = await api.get<Paginated<Note>>(`/notes/books/${bookId}/`, {
+    params: kind ? { kind } : undefined,
+  })
+  return data
+}
+
+export async function fetchUserNotes(userId: number) {
+  const { data } = await api.get<Paginated<Note>>(`/notes/users/${userId}/`)
   return data
 }

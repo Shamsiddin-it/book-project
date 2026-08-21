@@ -51,13 +51,35 @@ class PublicUserSerializer(serializers.ModelSerializer):
 
     followers_count = serializers.IntegerField(read_only=True)
     following_count = serializers.IntegerField(read_only=True)
+    is_following = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = [
             'id', 'username', 'photo', 'bio',
-            'followers_count', 'following_count', 'is_shelf_public',
+            'followers_count', 'following_count', 'is_following', 'is_shelf_public',
         ]
+
+    def get_is_following(self, obj):
+        """
+        Подписан ли на этого человека тот, кто смотрит.
+
+        Без этого поля кнопка «Подписаться» при загрузке страницы не знает
+        своего состояния и показывает неверную надпись.
+
+        В списках вьюха кладёт в контекст готовое множество id — иначе
+        получаем запрос на каждого пользователя в выдаче.
+        """
+        request = self.context.get('request')
+        viewer = getattr(request, 'user', None)
+        if viewer is None or not viewer.is_authenticated or viewer.pk == obj.pk:
+            return False
+
+        followed_ids = self.context.get('followed_ids')
+        if followed_ids is not None:
+            return obj.pk in followed_ids
+
+        return viewer.following.filter(following=obj).exists()
 
 
 class MeSerializer(serializers.ModelSerializer):

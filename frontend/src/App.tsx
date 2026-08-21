@@ -15,6 +15,7 @@ import { ReaderPage } from './pages/ReaderPage'
 import { RecommendationsPage } from './pages/RecommendationsPage'
 import { RegisterPage } from './pages/RegisterPage'
 import { SalePage } from './pages/SalePage'
+import { UserProfilePage } from './pages/UserProfilePage'
 import { ShelfPage } from './pages/ShelfPage'
 
 const queryClient = new QueryClient({
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="blog" element={<BlogPage />} />
               <Route path="blog/:slug" element={<BlogPostPage />} />
               <Route path="achievements" element={<AchievementsPage />} />
+              <Route path="users/:id" element={<UserProfilePage />} />
               <Route path="login" element={<LoginPage />} />
               <Route path="register" element={<RegisterPage />} />
 

@@ -95,7 +95,7 @@ export function Layout() {
                     ♥
                   </span>
                 </IconLink>
-                <IconLink to="/achievements" label={`Профиль: ${user.username}`}>
+                <IconLink to={`/users/${user.id}`} label={`Профиль: ${user.username}`}>
                   <span aria-hidden>👤</span>
                 </IconLink>
                 <button type="button" onClick={handleLogout} className={pillClass('outline', 'ml-1')}>

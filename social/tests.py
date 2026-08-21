@@ -211,3 +211,50 @@ class CommentTests(APITestCase):
 
         with self.assertNumQueries(4):
             self.client.get('/api/social/comments/')
+
+
+class IsFollowingFieldTests(APITestCase):
+    """
+    Кнопка «Подписаться» на фронте берёт состояние из этого поля.
+    Если оно врёт, пользователь видит неверную надпись до первого клика.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.alice = User.objects.create_user(username='alice', password=PASSWORD)
+        cls.bob = User.objects.create_user(username='bob', password=PASSWORD)
+        cls.carol = User.objects.create_user(username='carol', password=PASSWORD)
+        Follow.objects.create(follower=cls.alice, following=cls.bob)
+
+    def test_true_when_viewer_follows(self):
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get('/api/accounts/users/{}/'.format(self.bob.id))
+        self.assertTrue(response.json()['is_following'])
+
+    def test_false_when_viewer_does_not_follow(self):
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get('/api/accounts/users/{}/'.format(self.carol.id))
+        self.assertFalse(response.json()['is_following'])
+
+    def test_false_for_own_profile(self):
+        self.client.force_authenticate(user=self.alice)
+        response = self.client.get('/api/accounts/users/{}/'.format(self.alice.id))
+        self.assertFalse(response.json()['is_following'])
+
+    def test_false_for_anonymous(self):
+        response = self.client.get('/api/accounts/users/{}/'.format(self.bob.id))
+        self.assertFalse(response.json()['is_following'])
+
+    def test_lists_resolve_the_flag_without_a_query_per_user(self):
+        for index in range(8):
+            extra = User.objects.create_user(
+                username='extra{}'.format(index), password=PASSWORD,
+            )
+            Follow.objects.create(follower=extra, following=self.bob)
+
+        self.client.force_authenticate(user=self.alice)
+        url = '/api/social/users/{}/followers/'.format(self.bob.id)
+
+        self.client.get(url)  # прогрев
+        with self.assertNumQueries(4):
+            self.client.get(url)
