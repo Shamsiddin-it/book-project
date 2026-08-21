@@ -2,7 +2,7 @@ export function Spinner({ label }: { label?: string }) {
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-16">
       <div
-        className="size-8 animate-spin rounded-full border-2 border-line border-t-accent"
+        className="size-8 animate-spin rounded-full border-2 border-line border-t-mint"
         role="status"
         aria-label={label ?? 'Загрузка'}
       />
@@ -13,8 +13,8 @@ export function Spinner({ label }: { label?: string }) {
 
 export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="rounded-card border border-dashed border-line py-16 text-center">
-      <p className="font-serif text-lg text-ink">{title}</p>
+    <div className="rounded-card border border-dashed border-line bg-white/50 py-16 text-center">
+      <p className="text-lg font-bold text-ink">{title}</p>
       {hint && <p className="mt-2 text-sm text-ink-soft">{hint}</p>}
     </div>
   )

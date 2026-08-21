@@ -69,9 +69,19 @@ export interface Edition {
   published_year: number
   pages: number | null
   price: string
+  old_price: string | null
+  is_on_sale: boolean
+  discount_percent: number
   is_physical: boolean
   is_active: boolean
   audio_link: string | null
+}
+
+/** Лучшее предложение по книге — плашка со скидкой на карточке. */
+export interface SaleOffer {
+  old_price: string
+  price: string
+  discount_percent: number
 }
 
 export interface MoodboardImage {
@@ -100,6 +110,9 @@ export interface BookListItem {
   accent_color: string
   cover: string | null
   min_price: string | null
+  sale: SaleOffer | null
+  average_rating: number | null
+  reviews_count: number
   is_liked: boolean
   is_read: boolean
 }
@@ -118,6 +131,8 @@ export interface BookDetail {
   editions: Edition[]
   moodboard: MoodboardImage[]
   characters: Character[]
+  average_rating: number | null
+  reviews_count: number
   is_active: boolean
   created_at: string
   is_liked: boolean
@@ -259,4 +274,100 @@ export interface SimilarBooksResponse {
 export interface TokenPair {
   access: string
   refresh: string
+}
+
+/* ------------------------------------------------------------- отзывы */
+
+export interface Review {
+  id: number
+  user: UserBrief
+  book: number
+  rating: number
+  text: string
+  has_spoilers: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface RatingSummary {
+  book_id: number
+  average_rating: number | null
+  reviews_count: number
+  distribution: Record<string, number>
+}
+
+/* -------------------------------------------------------- геймификация */
+
+export interface Level {
+  number: number
+  name: string
+  min_points: number
+  icon: string
+}
+
+export interface Trophy {
+  id: number
+  code: string
+  name: string
+  description: string
+  icon: string
+  metric: string
+  metric_display: string
+  threshold: number
+  points: number
+}
+
+export interface TrophyProgress {
+  trophy: Trophy
+  earned: boolean
+  earned_at: string | null
+  current: number
+  progress: number
+}
+
+export interface GamificationProfile {
+  user: UserBrief
+  points: number
+  level: Level | null
+  next_level: Level | null
+  points_to_next: number | null
+  progress: number
+  metrics: Record<string, number>
+  trophies_earned: number
+  trophies_total: number
+  newly_awarded: Trophy[]
+}
+
+export interface LeaderboardEntry {
+  rank: number
+  user: UserBrief
+  points: number
+  level: Level | null
+  books_read: number
+}
+
+/* ---------------------------------------------------------------- блог */
+
+export interface BlogTag {
+  id: number
+  name: string
+  slug: string
+}
+
+export interface BlogPostCard {
+  id: number
+  title: string
+  slug: string
+  cover: string | null
+  excerpt: string
+  author: UserBrief | null
+  tags: BlogTag[]
+  published_at: string | null
+}
+
+export interface BlogPost extends BlogPostCard {
+  body: string
+  is_published: boolean
+  created_at: string
+  updated_at: string
 }

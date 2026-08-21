@@ -1,19 +1,27 @@
 import { api, tokenStore } from './client'
 import type {
+  BlogPost,
+  BlogPostCard,
+  BlogTag,
   BookDetail,
   BookListItem,
   CartResponse,
   Category,
   LanguageOption,
   Me,
+  GamificationProfile,
+  LeaderboardEntry,
   Order,
   Paginated,
+  RatingSummary,
   ReaderManifest,
   RecommendationResponse,
+  Review,
   ShelfItem,
   ShelfStatus,
   SimilarBooksResponse,
   TokenPair,
+  TrophyProgress,
 } from './types'
 
 /* ---------------------------------------------------------------- аккаунты */
@@ -59,6 +67,8 @@ export interface CatalogParams {
   categories?: number
   ordering?: string
   page?: number
+  on_sale?: boolean
+  min_rating?: number
 }
 
 export async function fetchBooks(params: CatalogParams = {}) {
@@ -167,5 +177,72 @@ export async function saveReadingProgress(
   progress: { progress_percent?: number; position?: string },
 ) {
   const { data } = await api.patch(`/reader/${editionId}/progress/`, progress)
+  return data
+}
+
+/* ------------------------------------------------------------- отзывы */
+
+export async function fetchBookReviews(bookId: number) {
+  const { data } = await api.get<Paginated<Review>>(`/reviews/books/${bookId}/`)
+  return data
+}
+
+export async function fetchRatingSummary(bookId: number): Promise<RatingSummary> {
+  const { data } = await api.get<RatingSummary>(`/reviews/books/${bookId}/summary/`)
+  return data
+}
+
+export async function submitReview(payload: {
+  book: number
+  rating: number
+  text?: string
+  has_spoilers?: boolean
+}) {
+  const { data } = await api.post<Review>('/reviews/', payload)
+  return data
+}
+
+export async function updateReview(id: number, payload: { rating?: number; text?: string }) {
+  const { data } = await api.patch<Review>(`/reviews/${id}/`, payload)
+  return data
+}
+
+/* -------------------------------------------------------- геймификация */
+
+export async function fetchMyGamification(): Promise<GamificationProfile> {
+  const { data } = await api.get<GamificationProfile>('/gamification/me/')
+  return data
+}
+
+export async function fetchTrophies(): Promise<TrophyProgress[]> {
+  const { data } = await api.get<TrophyProgress[]>('/gamification/trophies/')
+  return data
+}
+
+export async function fetchLeaderboard(): Promise<LeaderboardEntry[]> {
+  const { data } = await api.get<LeaderboardEntry[]>('/gamification/leaderboard/')
+  return data
+}
+
+/* ---------------------------------------------------------------- блог */
+
+export async function fetchBlogPosts(params: { search?: string; tag?: string } = {}) {
+  const { data } = await api.get<Paginated<BlogPostCard>>('/blog/posts/', {
+    params: {
+      search: params.search || undefined,
+      // Бэкенд фильтрует по slug тега.
+      tags__slug: params.tag || undefined,
+    },
+  })
+  return data
+}
+
+export async function fetchBlogPost(slug: string): Promise<BlogPost> {
+  const { data } = await api.get<BlogPost>(`/blog/posts/${slug}/`)
+  return data
+}
+
+export async function fetchBlogTags(): Promise<BlogTag[]> {
+  const { data } = await api.get<BlogTag[]>('/blog/tags/')
   return data
 }

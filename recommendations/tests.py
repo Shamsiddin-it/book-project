@@ -6,6 +6,7 @@ from django.test.utils import CaptureQueriesContext
 from rest_framework.test import APITestCase
 
 from books.models import Author, Book, BookAuthor, Category, Edition
+from reviews.models import Review
 from shelf.models import ShelfItem
 from social.models import Like
 
@@ -249,3 +250,57 @@ class LanguageListTests(APITestCase):
         Book.objects.filter(language='en').update(is_active=False)
         by_code = {row['code']: row for row in self.client.get('/api/languages/').json()}
         self.assertNotIn('en', by_code)
+
+class SerializerContractTests(APITestCase):
+    """
+    Рекомендации отдают книги тем же сериализатором, что и каталог.
+    Если выборку забыть аннотировать, поля рейтинга молча исчезают из ответа,
+    и фронт получает undefined там, где по контракту число. Так уже было.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.fantasy = Category.objects.create(name='Фэнтези')
+        cls.anchor = make_book('Имя ветра', categories=[cls.fantasy])
+        cls.other = make_book('Страх мудреца', categories=[cls.fantasy])
+
+        cls.reader = User.objects.create_user(username='reader', password=PASSWORD)
+        Like.objects.create(user=cls.reader, book=cls.anchor)
+
+    REQUIRED_FIELDS = {
+        'id', 'name', 'language', 'language_display', 'authors', 'accent_color',
+        'cover', 'min_price', 'sale', 'average_rating', 'reviews_count',
+        'is_liked', 'is_read',
+    }
+
+    def test_similar_books_carry_every_card_field(self):
+        response = self.client.get('/api/recommendations/similar/{}/'.format(self.anchor.id))
+        self.assertEqual(response.status_code, 200)
+
+        results = response.json()['results']
+        self.assertGreater(len(results), 0)
+        for item in results:
+            self.assertEqual(self.REQUIRED_FIELDS - set(item), set())
+
+    def test_personal_recommendations_carry_every_card_field(self):
+        self.client.force_authenticate(user=self.reader)
+        response = self.client.get('/api/recommendations/')
+
+        results = response.json()['results']
+        self.assertGreater(len(results), 0)
+        for item in results:
+            self.assertEqual(self.REQUIRED_FIELDS - set(item), set())
+
+    def test_rating_matches_the_catalogue(self):
+        User.objects.create_user(username='critic', password=PASSWORD)
+        Review.objects.create(
+            user=User.objects.get(username='critic'), book=self.other, rating=4,
+        )
+
+        similar = self.client.get(
+            '/api/recommendations/similar/{}/'.format(self.anchor.id)
+        ).json()['results']
+        card = next(item for item in similar if item['id'] == self.other.id)
+
+        self.assertEqual(card['average_rating'], 4.0)
+        self.assertEqual(card['reviews_count'], 1)

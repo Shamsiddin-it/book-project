@@ -1,67 +1,81 @@
 import { Link } from 'react-router-dom'
 
 import type { BookListItem } from '../api/types'
-
-function formatPrice(value: string | null) {
-  if (value === null) return 'Нет изданий'
-  const amount = Number(value)
-  if (Number.isNaN(amount)) return value
-  return `${amount.toLocaleString('ru-RU', { maximumFractionDigits: 0 })} ₽`
-}
+import { DiscountBadge, Price, Stars } from './ui'
 
 export function BookCard({ book }: { book: BookListItem }) {
   const authors = book.authors.map((author) => author.name).join(', ')
 
   return (
-    <Link
-      to={`/books/${book.id}`}
-      className="group flex flex-col overflow-hidden rounded-card border border-line bg-paper-raised transition hover:-translate-y-0.5 hover:shadow-lg"
-    >
-      <div
-        className="relative aspect-2/3 overflow-hidden"
-        // Фон под обложкой — цвет книги. Пока обложка грузится, карточка уже
-        // выглядит частью своей книги, а не серым прямоугольником.
-        style={{ backgroundColor: book.accent_color || 'var(--color-line)' }}
-      >
-        {book.cover ? (
-          <img
-            src={book.cover}
-            alt={`Обложка «${book.name}»`}
-            loading="lazy"
-            className="size-full object-cover transition duration-300 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="flex size-full items-center justify-center p-4">
-            <span className="text-center font-serif text-sm text-white/80">{book.name}</span>
-          </div>
-        )}
+    <article className="group flex flex-col overflow-hidden rounded-card bg-white shadow-sm ring-1 ring-ink/5 transition hover:-translate-y-1 hover:shadow-lg">
+      <Link to={`/books/${book.id}`} className="relative block">
+        <div
+          className="aspect-2/3 overflow-hidden"
+          // Пока обложка грузится, место занимает цвет книги, а не серый блок.
+          style={{ backgroundColor: book.accent_color || 'var(--color-mint-soft)' }}
+        >
+          {book.cover ? (
+            <img
+              src={book.cover}
+              alt={`Обложка «${book.name}»`}
+              loading="lazy"
+              className="size-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex size-full items-center justify-center p-4">
+              <span className="text-center text-sm font-semibold text-white/85">
+                {book.name}
+              </span>
+            </div>
+          )}
+        </div>
 
-        {book.is_read && (
-          <span className="absolute left-2 top-2 rounded-full bg-black/70 px-2 py-0.5 text-xs text-white">
-            Прочитано
+        {book.sale && (
+          <span className="absolute left-2 top-2">
+            <DiscountBadge percent={book.sale.discount_percent} />
           </span>
         )}
+
         {book.is_liked && (
           <span
-            className="absolute right-2 top-2 text-lg text-white drop-shadow"
+            className="absolute right-2 top-2 grid size-7 place-items-center rounded-full bg-white/90 text-sm text-blush shadow"
             aria-label="В избранном"
           >
             ♥
           </span>
         )}
-      </div>
 
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <h3 className="font-serif text-base leading-snug text-ink">{book.name}</h3>
-        {authors && <p className="text-sm text-ink-soft">{authors}</p>}
-        <div className="mt-auto flex items-center justify-between pt-2">
-          <span className="text-sm font-medium text-ink">{formatPrice(book.min_price)}</span>
-          <span className="text-xs uppercase tracking-wide text-ink-faint">
+        {book.is_read && (
+          <span className="absolute bottom-2 left-2 rounded-pill bg-ink/75 px-2 py-0.5 text-[11px] font-medium text-white">
+            Прочитано
+          </span>
+        )}
+      </Link>
+
+      <div className="flex flex-1 flex-col gap-1.5 p-3">
+        <Link to={`/books/${book.id}`} className="hover:underline">
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-ink">{book.name}</h3>
+        </Link>
+
+        {authors && <p className="line-clamp-1 text-xs text-ink-soft">{authors}</p>}
+
+        <Stars value={book.average_rating} count={book.reviews_count} />
+
+        <div className="mt-auto flex items-end justify-between gap-2 pt-1">
+          {book.min_price === null ? (
+            <span className="text-xs text-ink-faint">Нет изданий</span>
+          ) : (
+            <Price
+              value={book.sale ? book.sale.price : book.min_price}
+              oldValue={book.sale ? book.sale.old_price : null}
+            />
+          )}
+          <span className="text-[10px] uppercase tracking-wide text-ink-faint">
             {book.language_display}
           </span>
         </div>
       </div>
-    </Link>
+    </article>
   )
 }
 
@@ -71,6 +85,21 @@ export function BookGrid({ books }: { books: BookListItem[] }) {
       {books.map((book) => (
         <BookCard key={book.id} book={book} />
       ))}
+    </div>
+  )
+}
+
+/** Горизонтальная лента — для «Новинок» и «Со скидкой». */
+export function BookRail({ books }: { books: BookListItem[] }) {
+  return (
+    <div className="-mx-4 overflow-x-auto px-4 pb-2">
+      <div className="flex gap-4">
+        {books.map((book) => (
+          <div key={book.id} className="w-40 shrink-0 sm:w-44">
+            <BookCard book={book} />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

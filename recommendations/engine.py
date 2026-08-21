@@ -11,13 +11,27 @@
 и в самом конце — просто популярным.
 """
 
-from django.db.models import Count, Q
+from django.db.models import Avg, Count, Q
 
 from books.models import Book
 from shelf.models import ShelfItem
 from social.models import Like
 
 DEFAULT_LIMIT = 10
+
+
+def _books():
+    """
+    Базовая выборка книг для выдачи.
+
+    Аннотации обязательны: BookListSerializer ждёт average_rating и
+    reviews_count, и без них поля молча пропадают из ответа — фронт получает
+    undefined там, где по типам должно быть число.
+    """
+    return Book.objects.annotate(
+        average_rating=Avg('reviews__rating'),
+        reviews_count=Count('reviews', distinct=True),
+    ).prefetch_related('authors', 'editions')
 
 # Статусы полки, которые считаем осознанным интересом.
 # «Хочу прочитать» не в счёт: туда складывают наугад.
@@ -90,23 +104,20 @@ def _ordered_books(book_ids):
     if not book_ids:
         return []
 
-    books = Book.objects.filter(pk__in=book_ids, is_active=True).prefetch_related(
-        'authors', 'editions',
-    )
+    books = _books().filter(pk__in=book_ids, is_active=True)
     by_id = {book.id: book for book in books}
     return [by_id[book_id] for book_id in book_ids if book_id in by_id]
 
 
 def _popular_books(exclude_ids, limit, language=None):
     """Запасной вариант: просто самое залайканное."""
-    queryset = Book.objects.filter(is_active=True).exclude(pk__in=exclude_ids)
+    queryset = _books().filter(is_active=True).exclude(pk__in=exclude_ids)
     if language:
         queryset = queryset.filter(language=language)
 
     return list(
         queryset.annotate(likes_total=Count('likes', distinct=True))
-        .order_by('-likes_total', '-created_at')
-        .prefetch_related('authors', 'editions')[:limit]
+        .order_by('-likes_total', '-created_at')[:limit]
     )
 
 
@@ -146,11 +157,10 @@ def similar_to_book(book, limit=DEFAULT_LIMIT, user=None):
             kinship |= Q(authors__id__in=author_ids)
 
         neighbours = (
-            Book.objects.filter(kinship, is_active=True)
+            _books().filter(kinship, is_active=True)
             .exclude(pk__in=taken)
             .annotate(likes_total=Count('likes', distinct=True))
             .order_by('-likes_total', '-created_at')
-            .prefetch_related('authors', 'editions')
             .distinct()[: limit - len(result)]
         )
         result.extend(neighbours)
@@ -215,14 +225,13 @@ def recommend_for_user(user, limit=DEFAULT_LIMIT, language=None):
             if author_ids:
                 kinship |= Q(authors__id__in=author_ids)
 
-            queryset = Book.objects.filter(kinship, is_active=True).exclude(pk__in=taken)
+            queryset = _books().filter(kinship, is_active=True).exclude(pk__in=taken)
             if language:
                 queryset = queryset.filter(language=language)
 
             books.extend(
                 queryset.annotate(likes_total=Count('likes', distinct=True))
                 .order_by('-likes_total', '-created_at')
-                .prefetch_related('authors', 'editions')
                 .distinct()[: limit - len(books)]
             )
 
