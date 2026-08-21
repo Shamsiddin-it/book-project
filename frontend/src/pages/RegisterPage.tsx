@@ -6,7 +6,7 @@ import { useAuth } from '../auth/useAuth'
 import { ErrorNote, Spinner } from '../components/Spinner'
 
 const fieldClass =
-  'w-full rounded-lg border border-line bg-paper-raised px-3 py-2 text-sm outline-none focus:border-ink'
+  'w-full rounded-lg border border-line bg-white px-3 py-2 text-sm outline-none focus:border-ink'
 
 export function RegisterPage() {
   const { user, loading, register } = useAuth()
@@ -51,7 +51,7 @@ export function RegisterPage() {
 
   return (
     <div className="mx-auto max-w-sm space-y-6 py-8">
-      <h1 className="font-serif text-3xl text-ink">Регистрация</h1>
+      <h1 className="display-title text-3xl text-ink">Регистрация</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <ErrorNote message={error} />}
@@ -121,7 +121,7 @@ export function RegisterPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-full bg-ink py-2.5 text-sm text-paper transition hover:opacity-90 disabled:opacity-60"
+          className="w-full rounded-pill bg-ink py-2.5 text-sm text-cream transition hover:opacity-90 disabled:opacity-60"
         >
           {submitting ? 'Создаём аккаунт…' : 'Зарегистрироваться'}
         </button>

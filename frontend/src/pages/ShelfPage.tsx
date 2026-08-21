@@ -41,7 +41,7 @@ export function ShelfPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-serif text-3xl text-ink">Моя полка</h1>
+        <h1 className="display-title text-3xl text-ink">Моя полка</h1>
         <p className="mt-1 text-ink-soft">Купленное, прочитанное и отложенное.</p>
       </div>
 
@@ -52,9 +52,9 @@ export function ShelfPage() {
             type="button"
             onClick={() => setStatus(tab.value)}
             className={[
-              'rounded-full px-3 py-1.5 text-sm transition',
+              'rounded-pill px-3 py-1.5 text-sm transition',
               status === tab.value
-                ? 'bg-ink text-paper'
+                ? 'bg-ink text-cream'
                 : 'border border-line text-ink-soft hover:text-ink',
             ].join(' ')}
           >
@@ -72,7 +72,7 @@ export function ShelfPage() {
           {shelfQuery.data.results.map((item) => (
             <li
               key={item.id}
-              className="flex flex-wrap items-center gap-4 rounded-card border border-line bg-paper-raised p-3"
+              className="flex flex-wrap items-center gap-4 rounded-card border border-line bg-white p-3"
             >
               <div
                 className="h-24 w-16 shrink-0 overflow-hidden rounded"
@@ -91,7 +91,7 @@ export function ShelfPage() {
               <div className="min-w-48 flex-1">
                 <Link
                   to={`/books/${item.edition.book_id}`}
-                  className="font-serif text-lg text-ink hover:underline"
+                  className="text-lg font-bold text-ink hover:underline"
                 >
                   {item.edition.book_name}
                 </Link>
@@ -105,9 +105,9 @@ export function ShelfPage() {
 
                 {item.progress_percent > 0 && (
                   <div className="mt-2 flex items-center gap-2">
-                    <div className="h-1.5 w-32 overflow-hidden rounded-full bg-line">
+                    <div className="h-1.5 w-32 overflow-hidden rounded-pill bg-line">
                       <div
-                        className="h-full rounded-full bg-ink"
+                        className="h-full rounded-pill bg-ink"
                         style={{ width: `${item.progress_percent}%` }}
                       />
                     </div>
@@ -126,7 +126,7 @@ export function ShelfPage() {
                     })
                   }
                   aria-label="Статус книги"
-                  className="rounded-full border border-line bg-paper px-3 py-1.5 text-sm"
+                  className="rounded-pill border border-line bg-cream px-3 py-1.5 text-sm"
                 >
                   <option value="want">Хочу прочитать</option>
                   <option value="reading">Читаю</option>
@@ -136,7 +136,7 @@ export function ShelfPage() {
                 {item.is_owned && (
                   <Link
                     to={`/read/${item.edition.id}`}
-                    className="rounded-full bg-ink px-3 py-1.5 text-sm text-paper"
+                    className="rounded-pill bg-ink px-3 py-1.5 text-sm text-cream"
                   >
                     Читать
                   </Link>
@@ -145,7 +145,7 @@ export function ShelfPage() {
                 <button
                   type="button"
                   onClick={() => removeMutation.mutate(item.id)}
-                  className="rounded-full border border-line px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
+                  className="rounded-pill border border-line px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
                 >
                   Убрать
                 </button>

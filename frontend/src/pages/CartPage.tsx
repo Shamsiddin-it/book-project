@@ -43,7 +43,7 @@ export function CartPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="font-serif text-3xl text-ink">Корзина</h1>
+      <h1 className="display-title text-3xl text-ink">Корзина</h1>
 
       {error && <ErrorNote message={error} />}
 
@@ -53,7 +53,7 @@ export function CartPage() {
             {cart.results.map((item) => (
               <li
                 key={item.id}
-                className="flex items-center gap-4 rounded-card border border-line bg-paper-raised p-3"
+                className="flex items-center gap-4 rounded-card border border-line bg-white p-3"
               >
                 <div
                   className="h-20 w-14 shrink-0 overflow-hidden rounded"
@@ -67,7 +67,7 @@ export function CartPage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     to={`/books/${item.edition.book_id}`}
-                    className="font-serif text-lg text-ink hover:underline"
+                    className="text-lg font-bold text-ink hover:underline"
                   >
                     {item.edition.book_name}
                   </Link>
@@ -79,7 +79,7 @@ export function CartPage() {
                 <button
                   type="button"
                   onClick={() => removeMutation.mutate(item.id)}
-                  className="rounded-full border border-line px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
+                  className="rounded-pill border border-line px-3 py-1.5 text-sm text-ink-soft hover:text-ink"
                 >
                   Убрать
                 </button>
@@ -87,10 +87,10 @@ export function CartPage() {
             ))}
           </ul>
 
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-paper-raised p-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-card border border-line bg-white p-4">
             <div>
               <p className="text-sm text-ink-soft">Итого по прайсу</p>
-              <p className="font-serif text-2xl text-ink">{formatPrice(cart.total)}</p>
+              <p className="display-title text-2xl text-ink">{formatPrice(cart.total)}</p>
               {cart.purchases_are_free && (
                 <p className="mt-1 text-sm text-ink-soft">
                   Сейчас книги выдаются бесплатно — оплата не потребуется.
@@ -102,7 +102,7 @@ export function CartPage() {
               type="button"
               onClick={() => checkoutMutation.mutate()}
               disabled={checkoutMutation.isPending}
-              className="rounded-full bg-ink px-6 py-2.5 text-sm text-paper transition hover:opacity-90 disabled:opacity-60"
+              className="rounded-pill bg-ink px-6 py-2.5 text-sm text-cream transition hover:opacity-90 disabled:opacity-60"
             >
               {checkoutMutation.isPending
                 ? 'Оформляем…'

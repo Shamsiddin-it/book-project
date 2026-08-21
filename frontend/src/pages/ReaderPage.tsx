@@ -128,7 +128,7 @@ export function ReaderPage() {
     >
       <div className="flex flex-wrap items-baseline justify-between gap-3">
         <div>
-          <h1 className="font-serif text-2xl text-ink">{manifest.book_name}</h1>
+          <h1 className="display-title text-2xl text-ink">{manifest.book_name}</h1>
           <p className="text-sm text-ink-soft">
             {manifest.authors.map((author) => author.name).join(', ')} ·{' '}
             {manifest.format_display}
@@ -168,7 +168,7 @@ export function ReaderPage() {
         <ErrorNote message="У этого издания нет файла для чтения" />
       )}
 
-      <div className="flex flex-wrap items-center gap-4 rounded-card border border-line bg-paper-raised p-4">
+      <div className="flex flex-wrap items-center gap-4 rounded-card border border-line bg-white p-4">
         <label htmlFor="progress" className="text-sm text-ink-soft">
           Прогресс
         </label>
@@ -190,7 +190,7 @@ export function ReaderPage() {
             setDraftProgress(100)
             void persist(100)
           }}
-          className="accent-surface rounded-full px-4 py-1.5 text-sm text-white"
+          className="accent-surface rounded-pill px-4 py-1.5 text-sm text-white"
         >
           Дочитал
         </button>

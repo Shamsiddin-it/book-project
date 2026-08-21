@@ -1,33 +1,45 @@
 @import 'tailwindcss';
 
 /*
-  Палитра книжного магазина: тёплая бумажная база, чтобы обложки и мудборды
-  оставались главным цветовым пятном на странице.
+  Палитра BOOKLY, снятая с макета: кремовая база, мятная кнопка,
+  розовые пятна-акценты, почти чёрный текст.
 
-  --accent подменяется на лету цветом конкретной книги (Book.accent_color),
-  поэтому объявлен здесь со значением по умолчанию.
+  Фон страницы — мягкий градиент из мятного в розовый. Он лежит на html,
+  а не на body, иначе при короткой странице снизу остаётся белая полоса.
 */
 @theme {
-  --color-paper: #faf7f2;
-  --color-paper-raised: #ffffff;
-  --color-ink: #1c1917;
-  --color-ink-soft: #57534e;
-  --color-ink-faint: #a8a29e;
-  --color-line: #e7e2d9;
-  --color-accent: #6b4f3a;
+  --color-cream: #fdfaf6;
+  --color-mint: #8fc0b0;
+  --color-mint-soft: #b8dbcf;
+  --color-mint-wash: #e8f5ee;
+  --color-blush: #f2a2c6;
+  --color-blush-soft: #f9d3e5;
+  --color-blush-wash: #fbeaf3;
+  --color-ink: #14110f;
+  --color-ink-soft: #5c5651;
+  --color-ink-faint: #a29a94;
+  --color-line: #ece5dd;
 
-  --font-serif: 'Georgia', 'Times New Roman', serif;
-
-  --radius-card: 0.75rem;
+  --radius-card: 1rem;
+  --radius-pill: 999px;
 }
 
 :root {
-  --accent: var(--color-accent);
+  /* Цвет конкретной книги. Подменяется на странице книги и в ридере. */
+  --accent: var(--color-mint);
 }
 
 html {
-  background-color: var(--color-paper);
+  min-height: 100%;
   color: var(--color-ink);
+  background-color: var(--color-cream);
+  background-image: linear-gradient(
+    120deg,
+    var(--color-mint-wash) 0%,
+    var(--color-cream) 45%,
+    var(--color-blush-wash) 100%
+  );
+  background-attachment: fixed;
 }
 
 body {
@@ -36,7 +48,22 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Страница книги красится в цвет её обложки — см. BookPage. */
+/*
+  Заголовки и кнопки в макете набраны жирным с широким трекингом.
+  Вынесено в утилиты, чтобы не повторять три класса на каждом элементе.
+*/
+@utility display-title {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+@utility tracked {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Поверхность в цвет книги — страница книги и ридер. */
 .accent-surface {
   background-color: var(--accent);
 }
