@@ -18,6 +18,12 @@ schema_view = get_schema_view(
     authentication_classes=[JWTAuthentication],
 )
 
+# Подписи админки: по умолчанию там «Django administration»,
+# что ничего не говорит о проекте.
+admin.site.site_header = 'BOOKLY — управление магазином'
+admin.site.site_title = 'BOOKLY'
+admin.site.index_title = 'Что будем редактировать'
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
