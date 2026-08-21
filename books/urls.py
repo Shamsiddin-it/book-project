@@ -1,3 +1,4 @@
+from django.urls import path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
@@ -7,6 +8,7 @@ from .views import (
     CategoryViewSet,
     CharacterViewSet,
     EditionViewSet,
+    LanguageListView,
     MoodboardImageViewSet,
 )
 
@@ -19,4 +21,6 @@ router.register('moodboard', MoodboardImageViewSet, basename='moodboard')
 router.register('characters', CharacterViewSet, basename='character')
 router.register('book-authors', BookAuthorViewSet, basename='book-author')
 
-urlpatterns = router.urls
+urlpatterns = [
+    path('languages/', LanguageListView.as_view(), name='languages'),
+] + router.urls
