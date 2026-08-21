@@ -12,6 +12,8 @@ import {
 import type { Edition } from '../api/types'
 import { useAuth } from '../auth/useAuth'
 import { BookGrid } from '../components/BookCard'
+import { CommentsSection } from '../components/Comments'
+import { BookNotesSection } from '../components/Notes'
 import { ReviewsSection } from '../components/Reviews'
 import { EmptyState, ErrorNote, Spinner } from '../components/Spinner'
 import { DiscountBadge, Price, SectionHeading, Stars } from '../components/ui'
@@ -287,6 +289,10 @@ export function BookPage() {
       )}
 
       <ReviewsSection bookId={book.id} />
+
+      <BookNotesSection bookId={book.id} />
+
+      <CommentsSection bookId={book.id} />
 
       {similarQuery.data && similarQuery.data.results.length > 0 && (
         <section className="space-y-4">

@@ -97,7 +97,20 @@ class ToggleFollowView(APIView):
         })
 
 
-class FollowersView(ListAPIView):
+class FollowedIdsContextMixin:
+    """Кладёт в контекст id тех, на кого подписан смотрящий, — одним запросом."""
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        viewer = self.request.user
+        if viewer.is_authenticated:
+            context['followed_ids'] = set(
+                Follow.objects.filter(follower=viewer).values_list('following_id', flat=True)
+            )
+        return context
+
+
+class FollowersView(FollowedIdsContextMixin, ListAPIView):
     """Кто подписан на пользователя."""
 
     serializer_class = PublicUserSerializer
@@ -108,7 +121,7 @@ class FollowersView(ListAPIView):
         return _users_with_counts().filter(following__following=target).order_by('username')
 
 
-class FollowingView(ListAPIView):
+class FollowingView(FollowedIdsContextMixin, ListAPIView):
     """На кого подписан пользователь."""
 
     serializer_class = PublicUserSerializer

@@ -20,6 +20,8 @@ export interface PublicUser extends UserBrief {
   bio: string
   followers_count: number
   following_count: number
+  /** Подписан ли на этого человека тот, кто смотрит. */
+  is_following: boolean
   is_shelf_public: boolean
 }
 

@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { apiErrorMessage } from '../api/client'
 import { fetchLeaderboard, fetchMyGamification, fetchTrophies } from '../api/endpoints'
 import { useAuth } from '../auth/useAuth'
+import { plural, withCount } from '../lib/plural'
 import { ErrorNote, Spinner } from '../components/Spinner'
 import { SectionHeading } from '../components/ui'
 
@@ -74,7 +75,9 @@ export function AchievementsPage() {
             </div>
             <div className="ml-auto text-right">
               <p className="display-title text-3xl text-ink">{profile.points}</p>
-              <p className="text-xs text-ink-faint">очков</p>
+              <p className="text-xs text-ink-faint">
+                {plural(profile.points, 'очко', 'очка', 'очков')}
+              </p>
             </div>
           </div>
 
@@ -87,7 +90,12 @@ export function AchievementsPage() {
             </div>
             <p className="text-sm text-ink-soft">
               {profile.next_level
-                ? `До ступени «${profile.next_level.name}» — ${profile.points_to_next} очков`
+                ? `До ступени «${profile.next_level.name}» — ${withCount(
+                    profile.points_to_next ?? 0,
+                    'очко',
+                    'очка',
+                    'очков',
+                  )}`
                 : 'Максимальная ступень достигнута'}
             </p>
           </div>
