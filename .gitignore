@@ -11,6 +11,10 @@ media/
 protected_media/
 staticfiles/
 
+# Node
+node_modules/
+dist/
+
 # Python
 __pycache__/
 *.py[cod]
