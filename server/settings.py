@@ -161,6 +161,12 @@ PROTECTED_MEDIA_INTERNAL_URL = os.environ.get('PROTECTED_MEDIA_INTERNAL_URL', '/
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+# Покупки
+# Пока оплата не подключена, книги выдаются бесплатно: заказ создаётся
+# настоящий, но шаг оплаты пропускается. Когда появится Stripe — выключить.
+PURCHASES_ARE_FREE = env_bool('PURCHASES_ARE_FREE', True)
+
+
 # Django REST Framework
 
 REST_FRAMEWORK = {
