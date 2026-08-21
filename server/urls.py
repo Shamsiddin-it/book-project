@@ -27,6 +27,7 @@ urlpatterns = [
     path('api/shelf/', include('shelf.urls')),
     path('api/notes/', include('notes.urls')),
     path('api/reader/', include('reader.urls')),
+    path('api/purchase/', include('purchase.urls')),
     path('api/recommendations/', include('recommendations.urls')),
 
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
