@@ -21,7 +21,10 @@ class BookAuthorInline(admin.TabularInline):
 class EditionInline(admin.TabularInline):
     model = Edition
     extra = 1
-    fields = ['format', 'cover', 'isbn', 'publisher', 'published_year', 'pages', 'price', 'is_active']
+    fields = [
+        'format', 'cover', 'isbn', 'publisher', 'published_year',
+        'pages', 'price', 'old_price', 'is_active',
+    ]
 
 
 class MoodboardImageInline(admin.TabularInline):
@@ -70,7 +73,7 @@ class BookAdmin(admin.ModelAdmin):
 
 @admin.register(Edition)
 class EditionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'book', 'format', 'isbn', 'price', 'is_active']
+    list_display = ['id', 'book', 'format', 'isbn', 'price', 'old_price', 'is_active']
     list_filter = ['format', 'is_active']
     search_fields = ['book__name', 'isbn', 'publisher']
     autocomplete_fields = ['book']

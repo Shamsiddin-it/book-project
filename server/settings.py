@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'social',
     'shelf',
     'notes',
+    'reviews',
     'purchase',
     'reader',
     'recommendations',

@@ -113,6 +113,15 @@ class Edition(models.Model):
     )
     pages = models.PositiveIntegerField(null=True, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # Цена до скидки. Пусто — скидки нет. Хранить процент вместо старой цены
+    # нельзя: тогда при смене прайса «было» пересчитается задним числом и
+    # перестанет соответствовать тому, что видел покупатель.
+    old_price = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text='Цена до скидки. Должна быть больше текущей.',
+    )
+
     is_active = models.BooleanField(default=True)
 
     # Файлы для чтения и прослушивания внутри сайта.
@@ -134,6 +143,24 @@ class Edition(models.Model):
     @property
     def is_physical(self):
         return self.format in (self.Format.SOFT, self.Format.HARD)
+
+    @property
+    def is_on_sale(self):
+        return self.old_price is not None and self.old_price > self.price
+
+    @property
+    def discount_percent(self):
+        if not self.is_on_sale:
+            return 0
+        return int(round((self.old_price - self.price) / self.old_price * 100))
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.old_price is not None and self.old_price <= self.price:
+            raise ValidationError(
+                {'old_price': 'Цена до скидки должна быть больше текущей.'}
+            )
 
 
 class MoodboardImage(models.Model):

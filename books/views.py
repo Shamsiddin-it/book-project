@@ -1,4 +1,4 @@
-from django.db.models import Count, Prefetch
+from django.db.models import Avg, Count, Prefetch
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from server.permissions import IsAdminOrReadOnly
+
+from .filters import BookFilter
 from shelf.models import ShelfItem
 from social.models import Like
 
@@ -46,16 +48,25 @@ class AuthorViewSet(viewsets.ModelViewSet):
 
 class BookViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
-    filterset_fields = ['language', 'categories', 'authors', 'is_active']
+    filterset_class = BookFilter
     search_fields = ['name', 'description', 'authors__name']
-    ordering_fields = ['created_at', 'name', 'publishing_year']
+    ordering_fields = ['created_at', 'name', 'publishing_year', 'average_rating']
 
     def get_queryset(self):
         active_editions = Edition.objects.filter(is_active=True)
         queryset = Book.objects.prefetch_related(
             'authors',
             Prefetch('editions', queryset=active_editions),
-        )
+        ).annotate(
+            # Средний балл считаем в базе, одним запросом на всю страницу.
+            # distinct у Count обязателен: фильтры по изданиям добавляют джойн,
+            # который иначе размножит отзывы.
+            average_rating=Avg('reviews__rating'),
+            reviews_count=Count('reviews', distinct=True),
+        ).order_by('-created_at')
+        # Сортировка задана явно: annotate() добавляет GROUP BY, и Django
+        # перестаёт считать Meta.ordering применённой. Без этого пагинация
+        # не детерминирована — книга может попасть на две страницы сразу.
         if self.action == 'retrieve':
             # Каталогу это не нужно — лишние запросы на каждую страницу выдачи.
             queryset = queryset.prefetch_related(

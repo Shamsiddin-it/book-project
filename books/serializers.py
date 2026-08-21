@@ -37,13 +37,26 @@ class AuthorSerializer(serializers.ModelSerializer):
 class EditionSerializer(serializers.ModelSerializer):
     format_display = serializers.CharField(source='get_format_display', read_only=True)
     is_physical = serializers.BooleanField(read_only=True)
+    is_on_sale = serializers.BooleanField(read_only=True)
+    discount_percent = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Edition
         fields = [
             'id', 'book', 'format', 'format_display', 'cover', 'isbn', 'publisher',
-            'published_year', 'pages', 'price', 'is_physical', 'is_active', 'audio_link',
+            'published_year', 'pages', 'price', 'old_price', 'is_on_sale',
+            'discount_percent', 'is_physical', 'is_active', 'audio_link',
         ]
+
+    def validate(self, data):
+        old_price = data.get('old_price', getattr(self.instance, 'old_price', None))
+        price = data.get('price', getattr(self.instance, 'price', None))
+
+        if old_price is not None and price is not None and old_price <= price:
+            raise serializers.ValidationError(
+                {'old_price': 'Цена до скидки должна быть больше текущей.'}
+            )
+        return data
         # Сам файл книги не отдаём в каталоге — доступ к нему выдаёт ридер,
         # только владельцу издания.
 
@@ -111,13 +124,34 @@ class BookListSerializer(_UserFlagsMixin):
     language_display = serializers.CharField(source='get_language_display', read_only=True)
     cover = serializers.SerializerMethodField()
     min_price = serializers.SerializerMethodField()
+    # Приходят из annotate() во вьюхе: полей с такими именами в модели нет.
+    average_rating = serializers.FloatField(read_only=True)
+    reviews_count = serializers.IntegerField(read_only=True)
+    sale = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
         fields = [
             'id', 'name', 'language', 'language_display', 'authors',
-            'accent_color', 'cover', 'min_price', 'is_liked', 'is_read',
+            'accent_color', 'cover', 'min_price', 'sale',
+            'average_rating', 'reviews_count', 'is_liked', 'is_read',
         ]
+
+    def get_sale(self, obj):
+        """Лучшее предложение по книге — для плашки со скидкой на карточке."""
+        discounted = [
+            edition for edition in obj.editions.all()
+            if edition.is_active and edition.is_on_sale
+        ]
+        if not discounted:
+            return None
+
+        best = max(discounted, key=lambda edition: edition.discount_percent)
+        return {
+            'old_price': best.old_price,
+            'price': best.price,
+            'discount_percent': best.discount_percent,
+        }
 
     def get_cover(self, obj):
         edition = next((e for e in obj.editions.all() if e.is_active), None)
@@ -141,6 +175,8 @@ class BookDetailSerializer(_UserFlagsMixin):
     moodboard = MoodboardImageSerializer(many=True, read_only=True)
     characters = CharacterSerializer(many=True, read_only=True)
     language_display = serializers.CharField(source='get_language_display', read_only=True)
+    average_rating = serializers.FloatField(read_only=True)
+    reviews_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Book
@@ -148,6 +184,7 @@ class BookDetailSerializer(_UserFlagsMixin):
             'id', 'name', 'description', 'language', 'language_display',
             'authors', 'categories', 'publishing_year', 'accent_color',
             'editions', 'moodboard', 'characters',
+            'average_rating', 'reviews_count',
             'is_active', 'created_at', 'is_liked', 'is_read',
         ]
 
