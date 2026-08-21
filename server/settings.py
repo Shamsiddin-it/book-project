@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     'shelf',
     'notes',
     'reviews',
+    'gamification',
+    'blog',
     'purchase',
     'reader',
     'recommendations',
