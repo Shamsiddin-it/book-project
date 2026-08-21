@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'notes',
     'purchase',
     'reader',
+    'recommendations',
     'chats',
 
     # Сторонние

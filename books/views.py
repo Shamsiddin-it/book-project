@@ -1,5 +1,7 @@
 from django.db.models import Count, Prefetch
 from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.parsers import FormParser, MultiPartParser
 from rest_framework.permissions import IsAuthenticated
@@ -9,7 +11,9 @@ from server.permissions import IsAdminOrReadOnly
 from shelf.models import ShelfItem
 from social.models import Like
 
-from .models import Author, Book, BookAuthor, Category, Character, Edition, MoodboardImage
+from .models import (
+    Author, Book, BookAuthor, Category, Character, Edition, Language, MoodboardImage,
+)
 from .serializers import (
     AuthorSerializer,
     BookAuthorSerializer,
@@ -124,3 +128,32 @@ class BookAuthorViewSet(viewsets.ModelViewSet):
     serializer_class = BookAuthorSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_fields = ['book', 'author']
+
+
+class LanguageListView(APIView):
+    """
+    GET /api/languages/
+
+    Языки, на которых в каталоге реально есть книги, с количеством.
+    Нужен фронту, чтобы построить фильтр библиотеки: перечислять все
+    поддерживаемые языки бессмысленно, если книг на них нет.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        counts = dict(
+            Book.objects.filter(is_active=True)
+            .values_list('language')
+            .annotate(total=Count('id'))
+        )
+
+        return Response([
+            {
+                'code': code,
+                'name': name,
+                'books_count': counts.get(code, 0),
+            }
+            for code, name in Language.choices
+            if counts.get(code, 0) > 0
+        ])
